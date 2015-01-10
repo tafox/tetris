@@ -24,6 +24,8 @@ class Tetris:
         if event.key == pygame.K_RIGHT:
           for vertex in block.vertices:
             vertex[0] += 15
+        if event.key == pygame.K_UP:
+          block.rotate_acw()
 
   
   def get_block(self):
