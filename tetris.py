@@ -19,13 +19,17 @@ class Tetris:
         if event.key == pygame.K_ESCAPE:
           sys.exit()
         if event.key == pygame.K_LEFT:
+          block.center[0] -= 15
           for vertex in block.vertices:
             vertex[0] -= 15
         if event.key == pygame.K_RIGHT:
+          block.center[0] += 15
           for vertex in block.vertices:
             vertex[0] += 15
         if event.key == pygame.K_UP:
           block.rotate_acw()
+        if event.key == pygame.K_DOWN:
+          block.rotate_cw()
 
   
   def get_block(self):
@@ -70,6 +74,7 @@ while not(done):
     block = game.get_block() 
   pygame.draw.polygon(game.surface,block.color,block.vertices)
   
+  block.center[1] += block.speed
   for vertex in block.vertices:
     vertex[1] += block.speed
   for dead_block in dead_blocks:
