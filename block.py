@@ -1,40 +1,30 @@
+from board import board, getPos, setPos
+
 class Block:
   def __init__(self, shape):
     self.shape = shape
     self.array = 0;
     self.arrays = []
-    self.in_play = 1
     self.pos = [0,3]
-    self.board = []
    
   def getArray(self):
     return self.array 
 
-  def blockCollision(self, dead_blocks):
-    for dead_block in dead_blocks:
-      if self.collision(dead_block):
-        return True
-    return False
-
   def pointsToCheck(self):
+    array = self.arrays[self.array]
     points_to_check = []
-    for row in range(3):
-      blanks = 0
+    for row in range(4):
       for col in range(4):
-        if self.board.getBoardPos([self.pos[0]+row,self.pos[1]+col]) != 0:
+        if array[row][col] != 0:
           points_to_check.append([self.pos[0]+row, self.pos[1]+col])
-        else:
-          blanks+= 1
-        if blanks == 4:
-          return points_to_check
     return points_to_check
 
-  def collision(self, dead_block):
+  def blockCollision(self):
     points_to_check = self.pointsToCheck()
     last_row = points_to_check[-1][0]
     for point in points_to_check:
       if point[0] == last_row:
-        if self.board.getBoardPos([point[0]+1,point[1]]) != 0:
+        if getPos(point[0]+1,point[1]) != 0:
           return True
     return False
 
@@ -79,14 +69,11 @@ class I(Block):
     self.arrays = [self.array1, self.array2]
     self.array = 0
 
-  def blockCollision(self, dead_blocks):
-    return Block.blockCollision(self, dead_blocks)
+  def blockCollision(self):
+    return Block.blockCollision(self)
 
   def pointsToCheck(self):
     return Block.pointsToCheck(self)
-
-  def collision(self, dead_block):
-    return Block.collision(self, dead_block)
 
   def rotate(self):
     return Block.rotate(self)
@@ -122,14 +109,11 @@ class L(Block):
     self.arrays = [self.array1, self.array2, self.array3, self.array4]
     self.array = 0
     
-  def blockCollision(self, dead_blocks):
-    return Block.blockCollision(self, dead_blocks)
+  def blockCollision(self):
+    return Block.blockCollision(self)
 
   def pointsToCheck(self):
     return Block.pointsToCheck(self)
-
-  def collision(self, dead_block):
-    return Block.collision(self, dead_block)
 
   def rotate(self):
     return Block.rotate(self)
@@ -165,14 +149,11 @@ class J(Block):
     self.arrays = [self.array1, self.array2, self.array3, self.array4]
     self.array = 0
 
-  def blockCollision(self, dead_blocks):
-    return Block.blockCollision(self, dead_blocks)
+  def blockCollision(self):
+    return Block.blockCollision(self)
 
   def pointsToCheck(self):
     return Block.pointsToCheck(self)
-
-  def collision(self, dead_block):
-    return Block.collision(self, dead_block)
 
   def rotate(self):
     return Block.rotate(self)
@@ -196,14 +177,11 @@ class O(Block):
     self.arrays = [self.array1]
     self.array = 0
 
-  def blockCollision(self, dead_blocks):
-    return Block.blockCollision(self, dead_blocks)
+  def blockCollision(self):
+    return Block.blockCollision(self)
 
   def pointsToCheck(self):
     return Block.pointsToCheck(self)
-
-  def collision(self, dead_block):
-    return Block.collision(self, dead_block)
 
   def rotate(self):
     return Block.rotate(self)
@@ -239,14 +217,11 @@ class T(Block):
     self.arrays = [self.array1, self.array2, self.array3, self.array4]
     self.array = 0
 
-  def blockCollision(self, dead_blocks):
-    return Block.blockCollision(self, dead_blocks)
+  def blockCollision(self):
+    return Block.blockCollision(self)
 
   def pointsToCheck(self):
     return Block.pointsToCheck(self)
-
-  def collision(self, dead_block):
-    return Block.collision(self, dead_block)
 
   def rotate(self):
     return Block.rotate(self)
@@ -274,14 +249,11 @@ class S(Block):
     self.arrays = [self.array1, self.array2]
     self.array = 0
 
-  def blockCollision(self, dead_blocks):
-    return Block.blockCollision(self, dead_blocks)
+  def blockCollision(self):
+    return Block.blockCollision(self)
 
   def pointsToCheck(self):
     return Block.pointsToCheck(self)
-
-  def collision(self, dead_block):
-    return Block.collision(self, dead_block)
 
   def rotate(self):
     return Block.rotate(self)
@@ -309,14 +281,11 @@ class Z(Block):
     self.arrays = [self.array1, self.array2]
     self.array = 0
 
-  def blockCollision(self, dead_blocks):
-    return Block.blockCollision(self, dead_blocks)
+  def blockCollision(self):
+    return Block.blockCollision(self)
 
   def pointsToCheck(self):
     return Block.pointsToCheck(self)
-
-  def collision(self, dead_block):
-    return Block.collision(self, dead_block)
 
   def rotate(self):
     return Block.rotate(self)
@@ -329,4 +298,3 @@ class Z(Block):
 
   def inBoundsDown(self):
     return Block.inBoundsDown(self)
-
