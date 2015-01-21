@@ -1,7 +1,7 @@
 #!/usr/bin/env python3 
 
 import block, random, os, pygame
-from board import board, getPos, setPos
+from board import board, getPos, setPos, dead_blocks, setDead
 
 
 class Tetris:
@@ -10,14 +10,17 @@ class Tetris:
   
   def start(self):
     global board
+    global dead_blocks
     for row in range(20):
       new_row = []
+      other_row = []
       for col in range(10):
         new_row.append(0)
+        other_row.append(0)
       board.append(new_row)
+      dead_blocks.append(other_row)
     self.done = False
     self.block_shapes = ["I","L","J","O","T","S","Z"]
-    self.dead_blocks = []
     self.block = self.getBlock()
     self.array = self.block.arrays[self.block.array]
     self.screen = pygame.display.set_mode((200,400))
@@ -31,22 +34,20 @@ class Tetris:
       self.display()
 
   def fullLine(self):
-    global board
+    global dead_blocks
     full = None 
     for row in range(20):
       not_zero = 0
       for col in range(10):
-        if getPos(row,col) != 0:
+        if dead_blocks[row][col] != 0:
           not_zero += 1
         if not_zero == 10:
-          full = row
-    if full:
-      for col in range(10):
-        setPos(full, col, 0)
-      for row in range(full, 0, -1):
-        board[row] = board[row-1]
-      for col in range(10):
-        board[0][col] = 0
+          for col2 in range(10):
+            dead_blocks[row][col2] = 0
+          for row2 in range(row, 0, -1):
+            dead_blocks[row2] = dead_blocks[row2-1]
+          for col2 in range(10):
+            dead_blocks[0][col2] = 0
 
   def blockToBoard(self, oblock):
     array = oblock.arrays[oblock.array]
@@ -59,6 +60,17 @@ class Tetris:
     for col in range(10): 
       for row in range(20):
         setPos(row, col,0)
+  
+  def deadToBoard(self):
+    global board
+    global dead_blocks
+    print("dead")
+    for row in dead_blocks:
+      print(row)
+    print("")
+    for row in range(20):
+      for col in range(10):
+        board[row][col] = dead_blocks[row][col]
 
   def events(self):
     events =  pygame.event.get()
@@ -77,28 +89,61 @@ class Tetris:
           self.done = True
 
   def update(self):
-    self.clearBoard()
+    global dead_blocks
+    global board
+    self.deadToBoard()
     self.blockToBoard(self.block)
-    for dead_block in self.dead_blocks:
-      self.blockToBoard(dead_block)
+    print("board")
+    for row in board:
+      print(row)
+    print("")
     if not self.block.blockCollision() and self.block.inBoundsDown(): 
       self.block.pos[0] += 1;
     else:
+      print("Collision")
       if self.block.pos[0] == 0:
         self.done = True
-      self.dead_blocks.append(self.block)
+      print("board")
+      for row in board:
+        print(row)
+      for row in range(20):
+        for col in range(10):
+          dead_blocks[row][col] = board[row][col] 
+#      for row in range(4):
+#        for col in range(4):
+#          if self.array[row][col] != 0:
+#            print("write to dead")
+#            for row2 in dead_blocks:
+#              print(row2)
+#            print("end1")
+#            print("row" + str(row) + " col " + str(col))
+#            print(str(self.array[row][col]) + "assigning to" + str(dead_blocks[self.block.pos[0]+row][self.block.pos[1]+col]))
+#            print(str(self.block.pos[0]) + "by" + str(self.block.pos[1]))
+#            setDead(self.block.pos[0]+row, self.block.pos[1]+col, self.array[row][col])
+#            print("dead2")
+#            for row2 in dead_blocks:
+#              print(row2)
+#            print("board")
+#            for row2 in board:
+#              print(row2)
+#            print("end2")
       self.block = self.getBlock()
       self.array = self.block.arrays[self.block.array]
       self.fullLine()
+      print("end of update")
+      print("dead")
+      for row in dead_blocks:
+        print(row)
+      print("")
 
   def display(self):
-    self.screen.fill((0,0,0))
+    self.screen.fill((255,255,255))
     for row in range(20):
       for col in range(10):
         val = getPos(row,col)
         rect = pygame.Rect(col*20, row*20, 20, 20)
         if val == 0:
-          pygame.draw.rect(self.screen, (0,0,0), rect)
+          pygame.draw.rect(self.screen, (255,255,255), rect)
         elif val == 1:
           pygame.draw.rect(self.screen, (0,247,247), rect)
         elif val == 2:

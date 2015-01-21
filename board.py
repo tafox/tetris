@@ -1,4 +1,5 @@
 board = []
+dead_blocks = []
 
 def setPos(row, col, val):
   global board
@@ -15,4 +16,8 @@ def getPos(row,col):
   if 9 < col or col < 0:
     return 0
   return board[row][col]
+
+def setDead(row, col, val):
+  global dead_blocks
+  dead_blocks[row][col] = val
 

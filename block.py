@@ -13,19 +13,22 @@ class Block:
   def pointsToCheck(self):
     array = self.arrays[self.array]
     points_to_check = []
-    for row in range(4):
+    if array[0][0] == 1 and array[1][0] == 1:
+      return [[3+self.pos[0],self.pos[1]]]
+    for row in range(3):
       for col in range(4):
-        if array[row][col] != 0:
+        if array[row][col] != 0 and array[row+1][col] == 0:
           points_to_check.append([self.pos[0]+row, self.pos[1]+col])
     return points_to_check
 
   def blockCollision(self):
     points_to_check = self.pointsToCheck()
     last_row = points_to_check[-1][0]
+    print("points to check")
+    print(points_to_check)
     for point in points_to_check:
-      if point[0] == last_row:
-        if getPos(point[0]+1,point[1]) != 0:
-          return True
+      if getPos(point[0]+1,point[1]) != 0:
+        return True
     return False
 
   def rotate(self):
