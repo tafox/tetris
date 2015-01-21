@@ -1,6 +1,6 @@
 #!/usr/bin/env python3 
 
-import block, random, os, pygame
+import block, random, os, pygame, time
 from board import board, getPos, setPos, dead_blocks, setDead
 
 
@@ -24,8 +24,10 @@ class Tetris:
     self.block = self.getBlock()
     self.array = self.block.arrays[self.block.array]
     self.screen = pygame.display.set_mode((200,400))
+    self.last_moved = time.time()
+    self.movement_delay = 0.3
     clock = pygame.time.Clock()
-    FPS = 5
+    FPS = 30
     playtime = 0.0
     while not(self.done):
       clock.tick(FPS)
@@ -35,6 +37,10 @@ class Tetris:
 
   def fullLine(self):
     global dead_blocks
+    print("dead start of fullLine")
+    for row in dead_blocks:
+      print(row)
+    print("end of dead")
     full = None 
     for row in range(20):
       not_zero = 0
@@ -48,6 +54,10 @@ class Tetris:
             dead_blocks[row2] = dead_blocks[row2-1]
           for col2 in range(10):
             dead_blocks[0][col2] = 0
+  print("dead end of fullLine")
+  for row in dead_blocks:
+    print(row)
+  print("end of dead")
 
   def blockToBoard(self, oblock):
     array = oblock.arrays[oblock.array]
@@ -85,12 +95,20 @@ class Tetris:
         if event.key == pygame.K_UP:
           self.block.rotate()
           self.array = self.block.arrays[self.block.array]
+        if event.key == pygame.K_DOWN:
+          self.block.drop()
         if event.key == pygame.K_ESCAPE:
           self.done = True
 
   def update(self):
     global dead_blocks
     global board
+    fake = []
+    for i in range(20):
+      row = []
+      for j in range(10):
+        row.append(0)
+      fake.append(row)
     self.deadToBoard()
     self.blockToBoard(self.block)
     print("board")
@@ -98,7 +116,9 @@ class Tetris:
       print(row)
     print("")
     if not self.block.blockCollision() and self.block.inBoundsDown(): 
-      self.block.pos[0] += 1;
+      if time.time() - self.last_moved > self.movement_delay:
+        self.block.pos[0] += 1;
+        self.last_moved = time.time()
     else:
       print("Collision")
       if self.block.pos[0] == 0:
@@ -106,9 +126,24 @@ class Tetris:
       print("board")
       for row in board:
         print(row)
+      print("dead")
+      for row in dead_blocks:
+        print(row)
+      for row in range(20):
+        print("dead row" + str(row) + str(dead_blocks[row]))
+        for col in range(10):
+          fake[row][col] = board[row][col]
+          dead_blocks[row][col] = board[row][col] 
+        print("dead row" + str(row) + str(dead_blocks[row]))
+      print("dead")
+      for row in dead_blocks:
+        print(row)
+      print("fake")
+      for row in fake:
+        print(row)
       for row in range(20):
         for col in range(10):
-          dead_blocks[row][col] = board[row][col] 
+          dead_blocks[row][col] = fake[row][col]
 #      for row in range(4):
 #        for col in range(4):
 #          if self.array[row][col] != 0:
