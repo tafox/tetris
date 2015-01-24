@@ -1,4 +1,4 @@
-from board import board, getPos, setPos, dead_blocks
+from board import getPos, setPos, setDead, getDead
 
 class Block:
   def __init__(self, shape):
@@ -20,21 +20,27 @@ class Block:
         if array[row][col] != 0 and array[row+1][col] == 0:
           points_to_check.append([self.pos[0]+row, self.pos[1]+col])
     return points_to_check
+
+  def pointsOnTop(self):
+    array = self.arrays[self.array]
+    points_on_top = []
+    for row in range(4):
+      for col in range(4):
+        if array[row][col] != 0 and (row == 0 or array[row-1][col] == 0):
+          points_on_top.append([self.pos[0]+row, self.pos[1]+col])
+    return points_on_top
   
   def drop(self):
-    #doesn't work for first blocks
     points_to_check = self.pointsToCheck()
-    for point in points_to_check:
-      for i in range(20):
-        if point[0]+i == 19 or dead_blocks[point[0]+i][point[1]] != 0:
+    for i in range(20):
+      for point in points_to_check:
+        if point[0]+i == 20 or getDead(point[0]+i,point[1]) != 0:
           self.pos[0] += (i-1)
           return
 
   def blockCollision(self):
     points_to_check = self.pointsToCheck()
     last_row = points_to_check[-1][0]
-    print("points to check")
-    print(points_to_check)
     for point in points_to_check:
       if getPos(point[0]+1,point[1]) != 0:
         return True
