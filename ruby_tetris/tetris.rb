@@ -2,65 +2,144 @@
 
 require 'pp'
 require 'gosu'
+require_relative 'block'
+
+$board = []
+$dead = []
+
+def getBlock()
+  num = rand(7) + 1
+  if num == 1
+    return I.new
+  elsif num == 2
+    return L.new
+  elsif num == 3
+    return J.new
+  elsif num == 4
+    return O.new
+  elsif num == 5
+    return T.new
+  elsif num == 6
+    return S.new
+  else
+    return Z.new
+  end
+end
 
 class MyWindow < Gosu::Window
   def initialize
-    super(800,800,false)
+    super(200,400,false)
     self.caption = "Tetris"
     @font = Gosu::Font.new(self,"Arial",14)
     @board_height = 20
     @board_width = 10
-    for i in 0..@board_height
+    @square_length = 20
+    for i in 0...@board_height
       row = []
-      for j in 0..@board_width
+      for j in 0...@board_width
         row.push(0)
       end
-      @board.push(row)
+      $board.push(row)
     end
-    @movement_delay = 0.05
+    for i in 0...@board_height
+      row = []
+      for j in 0...@board_width
+        row.push(0)
+      end
+      $dead.push(row)
+    end
+    @movement_delay = 0.5
     @last_moved = Time.now
     @score = 0
+    @block = getBlock()
+  end
+
+  def button_down(id)
+    if id == Gosu::KbLeft and @block.inboundsLeft
+      @block.pos[1] -= 1
+    end
+    if id == Gosu::KbRight and @block.inboundsRight
+      @block.pos[1] += 1
+    end
+    if id == Gosu::KbUp
+      @block.rotate
+    end
+    if id == Gosu::KbDown
+      @block.drop
+    end
+    if id == Gosu::KbEscape
+      close
+    end
   end
 
   def update()
-    if button_down? Gosu::KbLeft
-      @block.pos[1] += 1
+    if Time.now - @last_moved > @movement_delay and @block.inboundsDown
+      @block.pos[0] += 1
+      @last_moved = Time.now
     end
-    if button_down? Gosu::KbRight
-      @block.pos[1] -= 1
+    if @block.blockCollision or not @block.inboundsDown
+      self.boardToDead
+      @block = getBlock()
+    end  
+  end
+
+  def boardToDead
+    for row in 0...@board_height
+      for col in 0...@board_width
+        $dead[row][col] = $board[row][col]
+      end
     end
-    if button_down? Gosu::KbUp
-      @block.rotate
+  end
+
+  def deadToBoard
+    for row in 0...@board_height
+      for col in 0...@board_width
+        $board[row][col] = $dead[row][col]
+      end
     end
-    if button_down? Gosu::KbDown
-      @block.down
-    end
-    if button_down? Gosu::KbEscape
-      close
-    end
-    if Time.now - @last_moved > @movement_delay
-      @block.pos[1] += 1
+  end
+
+  def blockToBoard()
+    puts @block.class.name
+    array = @block.getArray
+    for row in 0...4
+      for col in 0...4
+        $board[row+@block.pos[0]][col+@block.pos[1]] = array[row][col]
+      end
     end
   end
 
   def draw()
     clearBoard()
-    @snake.each do |point| 
-      @board[point[0]][point[1]] = 1
-    end
-    @board[@bit[0]][@bit[1]] = 2
+    deadToBoard()
+    blockToBoard()
     black = Gosu::Color.argb(0xff000000)
     green = Gosu::Color.argb(0xff00ff00)
     red = Gosu::Color.argb(0xffff0000)
-    for i in 0..@board_height
-      for j in 0..@board_width
-        if @board[i][j] == 0
+    for i in 0...@board_height
+      for j in 0...@board_width
+        if $board[i][j] == 0 
           draw_quad(j*@square_length,i*@square_length,black,j*@square_length+@square_length,i*@square_length,black,j*@square_length+@square_length,i*@square_length+@square_length,black,j*@square_length,i*@square_length+@square_length,black)
         end
-        if @board[i][j] == 1
+        if $board[i][j] == 1
           draw_quad(j*@square_length,i*@square_length,green,j*@square_length+@square_length,i*@square_length,green,j*@square_length+@square_length,i*@square_length+@square_length,green,j*@square_length,i*@square_length+@square_length,green)
         end
-        if @board[i][j] == 2
+        if $board[i][j] == 2
+          draw_quad(j*@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length+@square_length,red,j*@square_length,i*@square_length+@square_length,red)
+        end
+        if $board[i][j] == 3
+          draw_quad(j*@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length+@square_length,red,j*@square_length,i*@square_length+@square_length,red)
+        end
+        if $board[i][j] == 4
+          draw_quad(j*@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length+@square_length,red,j*@square_length,i*@square_length+@square_length,red)
+        end
+        if $board[i][j] == 5
+          draw_quad(j*@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length+@square_length,red,j*@square_length,i*@square_length+@square_length,red)
+        end
+        if $board[i][j] == 6
+          draw_quad(j*@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length+@square_length,red,j*@square_length,i*@square_length+@square_length,red)
+        end
+        if $board[i][j] == 7
           draw_quad(j*@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length,red,j*@square_length+@square_length,i*@square_length+@square_length,red,j*@square_length,i*@square_length+@square_length,red)
         end
       end
@@ -69,9 +148,9 @@ class MyWindow < Gosu::Window
   end
 
   def clearBoard()
-    for i in 0..@board_length
-      for j in 0..@board_length
-        @board[i][j] = 0
+    for i in 0...@board_height
+      for j in 0...@board_width
+        $board[i][j] = 0
       end
     end
   end
