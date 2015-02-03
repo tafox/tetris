@@ -10,7 +10,6 @@ class Block
   
   def pointsToCheck
     array = self.getArray
-    pp array
     points_to_check = []
     if array[0][0] == 1 and array[1][0] == 1
       return [[3+@pos[0],@pos[1]]]

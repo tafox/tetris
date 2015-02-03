@@ -73,11 +73,12 @@ class MyWindow < Gosu::Window
   end
 
   def update()
-    if Time.now - @last_moved > @movement_delay and @block.inboundsDown
-      @block.pos[0] += 1
-      @last_moved = Time.now
-    end
-    if @block.blockCollision or not @block.inboundsDown
+    if @block.inboundsDown and not @block.blockCollision
+      if Time.now - @last_moved > @movement_delay and @block.inboundsDown
+        @block.pos[0] += 1
+        @last_moved = Time.now
+      end
+    else
       self.boardToDead
       @block = getBlock()
     end  
@@ -100,11 +101,12 @@ class MyWindow < Gosu::Window
   end
 
   def blockToBoard()
-    puts @block.class.name
     array = @block.getArray
     for row in 0...4
       for col in 0...4
-        $board[row+@block.pos[0]][col+@block.pos[1]] = array[row][col]
+        if array[row][col] != 0
+          $board[row+@block.pos[0]][col+@block.pos[1]] = array[row][col]
+        end
       end
     end
   end
@@ -113,6 +115,7 @@ class MyWindow < Gosu::Window
     clearBoard()
     deadToBoard()
     blockToBoard()
+    pp $board 
     black = Gosu::Color.argb(0xff000000)
     green = Gosu::Color.argb(0xff00ff00)
     red = Gosu::Color.argb(0xffff0000)
