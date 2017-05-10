@@ -1,8 +1,10 @@
 board = []
 dead_blocks = []
+board_height = 20;
+board_height_limit = 19
 
 def init():
-  for row in range(20):
+  for row in range(board_height):
     new_row = []
     other_row = []
     for col in range(10):
@@ -13,7 +15,7 @@ def init():
 
 def setPos(row, col, val):
   global board
-  if 19 < row or row < 0:
+  if board_height_limit < row or row < 0:
     return 
   if 9 < col or col < 0:
     return 
@@ -21,13 +23,16 @@ def setPos(row, col, val):
 
 def getPos(row,col):
   global board
-  if 19 < row or row  < 0:
+  if board_height_limit < row or row  < 0:
     return 0
   if 9 < col or col < 0:
     return 0
   return board[row][col]
 
 def setDead(row, col, val):
+  if row == 0:
+    print("GAME OVER");
+    return True
   global dead_blocks
   printDead()
   print(val)
@@ -35,6 +40,7 @@ def setDead(row, col, val):
   dead_blocks[row][col] = val
   print("["+str(row)+"]["+str(col)+"] = " + str(dead_blocks[row][col]))
   printDead()
+  return False 
 
 def getDead(row, col):
   return dead_blocks[row][col]
@@ -44,10 +50,10 @@ def setDeadRow(row, row2):
 
 def printBoard():
   print("Board")
-  for row in range(20):
+  for row in range(board_height):
     print(str(board[row])+ str(row))
 
 def printDead():
   print("Dead")
-  for row in range(20):
+  for row in range(board_height):
     print(str(dead_blocks[row]) + str(row))

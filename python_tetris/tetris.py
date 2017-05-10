@@ -1,5 +1,5 @@
 #!/usr/bin/env python3 
-
+  
 import block, random, os, pygame, time
 from board import init, getDead, setDead, getPos, setPos, setDeadRow, printDead, printBoard
 
@@ -22,33 +22,12 @@ class Tetris:
     self.songs = ["TranceTechno.wav", "2PMTetris.wav", "TetrisBass.wav", "TetrisSong.wav", "TetrisAmazing.wav", "TetrisTheme.wav", "TetrisDacav.wav"]
     clock = pygame.time.Clock()
     FPS = 30
-    while not(self.done):
+    while not self.done:
+      print(self.done)
       clock.tick(FPS)
       self.events()
       self.update()
       self.display()
-
-  def clearGlitch(self):
-    global dead_blocks
-    number = None
-    array = self.block.arrays[self.block.array]
-    for i in range(4):
-      for j in range(4):
-        if array[i][j] != 0:
-          number = array[i][j]
-    points_on_top = self.block.pointsOnTop()
-    print(points_on_top)
-    for point in points_on_top:
-      num = 0
-      for row in range(point[0]):
-        if getDead(row, point[1]) == number:
-          num += 1
-      if num == point[0]:
-        printDead()
-        print("clearing")
-        for i in range(point[0]):
-          print([i,point[1]])
-          setDead(i,point[1],0)
 
   def fullLine(self):
     full = None 
@@ -79,15 +58,9 @@ class Tetris:
         setPos(row, col,0)
   
   def deadToBoard(self):
-#    print("line 84")
-#    printBoard()
-#    printDead()
     for row in range(self.height):
       for col in range(self.width):
         setPos(row,col,getDead(row,col))
-#    print("line 90")
-#    printBoard()
-#    printDead()
 
   def events(self):
     events =  pygame.event.get()
@@ -126,35 +99,21 @@ class Tetris:
       pygame.mixer.music.play()
 
   def update(self):
-#    print("line 120")
-#    printBoard()
-#    printDead()
     self.deadToBoard()
-#    print("line 127")
-#    printBoard()
-#    printDead()
     self.blockToBoard(self.block)
-#    print("line 131")
-#    printBoard()
-#    printDead()
     if not self.block.blockCollision() and self.block.inBoundsDown(): 
       if time.time() - self.last_moved > self.movement_delay:
         self.block.pos[0] += 1;
         self.last_moved = time.time()
     else:
-#      if self.block.pos[0] == 0:
-#        self.pause()
-      #print("line 147")
-      #printDead()
       array = self.block.arrays[self.block.array]
       for row in range(4):
         for col in range(4):
           if array[row][col] != 0:
-            #what happens here???!!!
-            setDead(row+self.block.pos[0],col+self.block.pos[1],array[row][col])
-      #print("line 155")
-      #printDead()
-      #self.clearGlitch()
+            over_top = setDead(row+self.block.pos[0],col+self.block.pos[1],array[row][col])
+            if over_top == True:
+              self.done = True
+              return
       self.block = self.getBlock()
       self.array = self.block.arrays[self.block.array]
       self.fullLine()
